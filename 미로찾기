@@ -1,0 +1,162 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+#include <time.h>
+
+#define MAZE_COUNT 5
+#define MAZE_SIZE 10
+#define PLAYER 'P'
+#define WALL '#'
+#define START 'S'
+#define GOAL 'G'
+#define EMPTY ' '
+
+char mazes[MAZE_COUNT][MAZE_SIZE][MAZE_SIZE] = {
+    {
+        {'S', ' ', ' ', '#', '#', '#', '#', '#', ' ', ' '},
+        {'#', ' ', '#', '#', ' ', ' ', ' ', '#', ' ', '#'},
+        {'#', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', '#'},
+        {'#', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', '#'},
+        {'#', ' ', '#', '#', '#', ' ', '#', '#', '#', '#'},
+        {'#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'},
+        {'#', '#', '#', '#', '#', '#', '#', '#', ' ', '#'},
+        {'#', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#'},
+        {'#', ' ', '#', '#', '#', ' ', '#', '#', ' ', '#'},
+        {'G', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' '}
+    },
+    {
+        {'S', ' ', ' ', '#', '#', '#', '#', '#', ' ', ' '},
+        {'#', '#', ' ', '#', ' ', ' ', ' ', '#', ' ', '#'},
+        {'#', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', '#'},
+        {'#', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', '#'},
+        {'#', ' ', '#', '#', '#', '#', '#', '#', '#', '#'},
+        {'#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'},
+        {'#', '#', '#', '#', '#', '#', '#', '#', ' ', '#'},
+        {'#', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#'},
+        {'#', ' ', '#', '#', '#', ' ', '#', '#', ' ', '#'},
+        {'G', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' '}
+    },
+    {
+        {'S', ' ', ' ', '#', '#', '#', '#', '#', ' ', ' '},
+        {'#', ' ', '#', '#', ' ', ' ', ' ', '#', ' ', '#'},
+        {'#', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', '#'},
+        {'#', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', '#'},
+        {'#', '#', '#', '#', ' ', '#', '#', ' ', '#', '#'},
+        {'#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'},
+        {'#', '#', '#', '#', '#', '#', '#', '#', ' ', '#'},
+        {'#', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#'},
+        {'#', ' ', '#', '#', '#', ' ', '#', '#', ' ', '#'},
+        {'G', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' '}
+    },
+    {
+        {'S', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', ' '},
+        {'#', '#', '#', '#', ' ', ' ', ' ', '#', ' ', '#'},
+        {'#', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', '#'},
+        {'#', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', '#'},
+        {'#', ' ', '#', '#', '#', '#', '#', '#', '#', '#'},
+        {'#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'},
+        {'#', '#', '#', '#', '#', '#', '#', '#', ' ', '#'},
+        {'#', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#'},
+        {'#', ' ', '#', '#', '#', ' ', '#', '#', ' ', '#'},
+        {'G', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' '}
+    },
+    {
+        {'S', ' ', ' ', ' ', ' ', '#', '#', '#', ' ', ' '},
+        {'#', '#', '#', '#', ' ', ' ', ' ', '#', ' ', '#'},
+        {'#', ' ', ' ', ' ', '#', '#', ' ', '#', ' ', '#'},
+        {'#', ' ', '#', ' ', ' ', ' ', ' ', '#', ' ', '#'},
+        {'#', ' ', '#', '#', '#', '#', '#', '#', '#', '#'},
+        {'#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '#'},
+        {'#', '#', ' ', '#', '#', '#', '#', '#', ' ', '#'},
+        {'#', ' ', ' ', ' ', ' ', ' ', ' ', '#', ' ', '#'},
+        {'#', ' ', '#', '#', '#', ' ', '#', '#', ' ', '#'},
+        {'G', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' '}
+    }
+};
+
+int playerRow, playerCol;
+
+void printMaze(char maze[MAZE_SIZE][MAZE_SIZE]) {
+    system("cls");
+
+    for (int i = 0; i < MAZE_SIZE; i++) {
+        for (int j = 0; j < MAZE_SIZE; j++) {
+            printf("%c ", maze[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+int isValidMove(char maze[MAZE_SIZE][MAZE_SIZE], int row, int col) {
+    return row >= 0 && row < MAZE_SIZE && col >= 0 && col < MAZE_SIZE && maze[row][col] != WALL;
+}
+
+void movePlayer(char direction, char maze[MAZE_SIZE][MAZE_SIZE]) {
+    int newRow = playerRow;
+    int newCol = playerCol;
+
+    switch (direction) {
+    case 'w':
+        newRow--;
+        break;
+    case 's':
+        newRow++;
+        break;
+    case 'a':
+        newCol--;
+        break;
+    case 'd':
+        newCol++;
+        break;
+    }
+
+    if (isValidMove(maze, newRow, newCol)) {
+        if (maze[newRow][newCol] == GOAL) {
+            printf("미로를 찾았습니다! 축하합니다!\n");
+            _getch();
+            exit(0);
+        }
+
+        maze[playerRow][playerCol] = EMPTY;
+        playerRow = newRow;
+        playerCol = newCol;
+        maze[playerRow][playerCol] = PLAYER;
+    }
+}
+
+void selectRandomMaze(char maze[MAZE_SIZE][MAZE_SIZE]) {
+    int randomIndex = rand() % MAZE_COUNT;
+    for (int i = 0; i < MAZE_SIZE; i++) {
+        for (int j = 0; j < MAZE_SIZE; j++) {
+            maze[i][j] = mazes[randomIndex][i][j];
+            if (maze[i][j] == START) {
+                playerRow = i;
+                playerCol = j;
+            }
+        }
+    }
+}
+
+int main() {
+    srand((unsigned int)time(NULL));
+
+    char currentMaze[MAZE_SIZE][MAZE_SIZE];
+    selectRandomMaze(currentMaze);
+
+    char move;
+    do {
+        printMaze(currentMaze);
+        printf("이동 방향을 선택하세요 (w: 위, s: 아래, a: 왼쪽, d: 오른쪽, q: 종료): ");
+        move = _getch();
+
+        if (move == 'q') {
+            printf("게임을 종료합니다.\n");
+            break;
+        }
+
+        movePlayer(move, currentMaze);
+
+    } while (1);
+
+    return 0;
+}
